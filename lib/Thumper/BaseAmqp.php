@@ -147,6 +147,9 @@ abstract class BaseAmqp
      */
     public function setRoutingKey($routingKey)
     {
+        if (!is_array($routingKey)) {
+            $routingKey = [$routingKey];
+        }
         $this->routingKey = $routingKey;
     }
 
@@ -200,8 +203,10 @@ abstract class BaseAmqp
             );
 
         if (isset($this->exchangeOptions['name'])) {
-            $this->channel
-                ->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+            foreach ($this->routingKey as $routingKey) {
+                $this->channel
+                    ->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+            }
         }
 
         $this->channel
